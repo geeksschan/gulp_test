@@ -1,13 +1,31 @@
-const BrowserSync = require('browser-sync').create();
+const { src, dest, watch, series } = require('gulp');
 
-function browserSync(cb) {
-  BrowserSync.init({
+const sass = require('gulp-sass');
+const browserSync = require('browser-sync').create();
+
+function runBrowserSync(cb) {
+  browserSync.init({
+    watch: true,
     server: {
-      baseDir: "./src"
+      baseDir: "./src",
+      directory: true
     }
   });
 
   cb();
 }
 
-exports.browser = browserSync;
+function runWatch(cb) {
+  watch('./src/scss/**/*.scss', runSass);
+  // watch('./src/*.html').on('change', browserSync.reload);
+  cb();
+}
+
+function runSass(cb) {
+  return src('./src/scss/**/*.scss')
+        .pipe(sass().on('error', sass.logError()))
+        .pipe(dest('./src/css'))
+        .pipe(browserSync.stream());
+}
+
+exports.browser = series(runBrowserSync, runWatch);
