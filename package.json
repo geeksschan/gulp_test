@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/geeksschan/gulp_test#readme",
   "devDependencies": {
+    "autoprefixer": "^9.6.1",
     "browser-sync": "^2.26.7",
     "gulp": "^4.0.2",
+    "gulp-postcss": "^8.0.0",
     "gulp-sass": "^4.0.2",
     "node-sass": "^4.12.0"
   }
