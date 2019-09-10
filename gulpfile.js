@@ -3,7 +3,11 @@ const { src, dest, watch, series } = require('gulp');
 const sass = require('gulp-sass');
 const browserSync = require('browser-sync').create();
 const postcss = require('gulp-postcss');
+const spritesmith = require('gulp.spritesmith');
 const autoprefixer = require('autoprefixer');
+const imagemin = require('gulp-imagemin');
+const merge = require('merge-stream');
+const through2 = require('through2');
 
 function runBrowserSync(cb) {
   browserSync.init({
@@ -39,5 +43,33 @@ function runSass(cb) {
         .pipe(browserSync.stream());
 }
 
+function runSprite(cb) {
+  const option = {
+    imgName: 'sprite.png',
+    cssName: 'sprite.scss',
+    cssFormat: 'scss',
+    padding: 4,
+  };
+
+  var spriteData = src('./src/sprite/*.png')
+                  .pipe(spritesmith(option));
+  
+  var imgStream = spriteData.img
+                  .pipe(dest('./src/image/'));
+  var cssStream = spriteData.css
+                  .pipe(dest('./src/css/'));
+
+  return merge(imgStream, cssStream);         
+}
+
+function getFolder(cb) {
+  src('./src/**/').pipe(through2.obj(function(chunk, enc, callback) {
+    console.log(chunk);
+  }));
+  
+  cb();
+}
+
 exports.default = series(runBrowserSync, runSass, runWatch);
-exports.test = runSass;
+// exports.test = runSprite;
+exports.test = getFolder;
